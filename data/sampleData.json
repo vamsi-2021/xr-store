@@ -1,0 +1,70 @@
+{
+  "user": {
+    "name": "Vamsi G",
+    "battery": "77%",
+    "status": "Currently Online"
+  },
+  "storeApps": [
+    {
+      "id": "s1",
+      "name": "Asgard's Wrath 2",
+      "thumbnail": "https://placehold.co/600x300/1a3a5c/cce0f5/png?text=Asgard%27s+Wrath+2",
+      "requirements": "Quest 2 or later, 14 GB storage",
+      "description": "A massive action RPG with epic battles and deep storyline set in a mythological world.",
+      "releaseNotes": "v2.1 - New dungeon, balance improvements, controller mapping fixes."
+    },
+    {
+      "id": "s2",
+      "name": "Pistol Whip",
+      "thumbnail": "https://placehold.co/600x300/2a1a4a/cce0f5/png?text=Pistol+Whip",
+      "requirements": "Quest 2 or later, 2 GB storage",
+      "description": "An unstoppable action-rhythm experience. Shoot, dodge, and move to the beat.",
+      "releaseNotes": "v3.0 - New scenes pack, visual overhaul, haptic feedback tuned."
+    },
+    {
+      "id": "s3",
+      "name": "Resident Evil 4",
+      "thumbnail": "https://placehold.co/600x300/1a2a1a/cce0f5/png?text=Resident+Evil+4",
+      "requirements": "Quest 3 recommended, 8 GB storage",
+      "description": "The iconic survival horror game rebuilt from the ground up for VR.",
+      "releaseNotes": "v1.5 - Mercenaries mode added, performance optimizations for Quest 3."
+    },
+    {
+      "id": "s4",
+      "name": "Among Us VR",
+      "thumbnail": "https://placehold.co/600x300/1a1a3a/cce0f5/png?text=Among+Us+VR",
+      "requirements": "Quest 2 or later, 1 GB storage",
+      "description": "Play the smash-hit social deduction game fully immersed in virtual reality.",
+      "releaseNotes": "v1.2 - New map: The Skeld, crossplay improvements."
+    }
+  ],
+  "installedApps": [
+    {
+      "id": "1",
+      "name": "Beat Saber",
+      "timeInApp": "02:45",
+      "thumbnail": "https://placehold.co/600x300/3a1a1a/cce0f5/png?text=Beat+Saber",
+      "requirements": "Quest 2 or later, 1.2 GB storage",
+      "description": "Beat Saber is a VR rhythm game where you slash the beats of adrenaline-pumping music with your sabers.",
+      "releaseNotes": "v1.35 - New music pack added, improved hand tracking support, bug fixes."
+    },
+    {
+      "id": "2",
+      "name": "VR Chat",
+      "timeInApp": "01:20",
+      "thumbnail": "https://placehold.co/600x300/1a3a3a/cce0f5/png?text=VR+Chat",
+      "requirements": "Quest 2 or later, 800 MB storage",
+      "description": "VRChat offers an endless collection of social VR experiences by giving the power of creation to its community.",
+      "releaseNotes": "v2024.1 - Avatar dynamics improvements, new worlds, performance optimizations."
+    },
+    {
+      "id": "3",
+      "name": "Superhot VR",
+      "timeInApp": "00:55",
+      "thumbnail": "https://placehold.co/600x300/3a2a1a/cce0f5/png?text=Superhot+VR",
+      "requirements": "Quest 2 or later, 1.5 GB storage",
+      "description": "SUPERHOT VR is the award-winning VR game where time moves only when you move.",
+      "releaseNotes": "v1.10 - Endless mode updates, leaderboard fixes, controller haptics improved."
+    }
+  ]
+}

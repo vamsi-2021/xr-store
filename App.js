@@ -1,20 +1,47 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import { View, ActivityIndicator } from 'react-native';
+import { useFonts, Lato_400Regular, Lato_700Bold } from '@expo-google-fonts/lato';
+import LoginScreen from './screens/LoginScreen';
+import DashboardScreen from './screens/DashboardScreen';
+import AppDetailScreen from './screens/AppDetailScreen';
+import StoreScreen from './screens/StoreScreen';
 
 export default function App() {
+  const [screen, setScreen] = useState('login'); // 'login' | 'dashboard' | 'store' | 'detail'
+  const [selectedApp, setSelectedApp] = useState(null);
+  const [fontsLoaded] = useFonts({ Lato_400Regular, Lato_700Bold });
+
+  if (!fontsLoaded) {
+    return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><ActivityIndicator /></View>;
+  }
+
+  if (screen === 'login') {
+    return <LoginScreen onLogin={() => setScreen('dashboard')} />;
+  }
+
+  if (screen === 'detail' && selectedApp) {
+    return (
+      <AppDetailScreen
+        app={selectedApp}
+        onBack={() => setScreen('dashboard')}
+        onOpenStore={() => setScreen('store')}
+      />
+    );
+  }
+
+  if (screen === 'store') {
+    return (
+      <StoreScreen
+        onBack={() => setScreen('dashboard')}
+        onSelectApp={(app) => { setSelectedApp(app); setScreen('detail'); }}
+      />
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <DashboardScreen
+      onSelectApp={(app) => { setSelectedApp(app); setScreen('detail'); }}
+      onOpenStore={() => setScreen('store')}
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
