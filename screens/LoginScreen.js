@@ -20,17 +20,46 @@ const BUTTON_BG = '#3a7bd5';
 const TEXT = '#e0f0ff';
 const LABEL = '#cce0f5';
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export default function LoginScreen({ onLogin }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+
+  const validateEmail = (value) => {
+    if (!value.trim()) {
+      setEmailError('Email is required.');
+      return false;
+    }
+    if (!EMAIL_REGEX.test(value.trim())) {
+      setEmailError('Please enter a valid email address.');
+      return false;
+    }
+    setEmailError('');
+    return true;
+  };
+
+  const validatePassword = (value) => {
+    if (!value) {
+      setPasswordError('Password is required.');
+      return false;
+    }
+    if (value.length < 8) {
+      setPasswordError('Password must be at least 8 characters.');
+      return false;
+    }
+    setPasswordError('');
+    return true;
+  };
 
   const handleLogin = async () => {
-    if (!username.trim() || !password.trim()) {
-      setError('Please enter your username and password.');
-      return;
-    }
+    const isEmailValid = validateEmail(username);
+    const isPasswordValid = validatePassword(password);
+    if (!isEmailValid || !isPasswordValid) return;
     setError('');
     setLoading(true);
     try {
@@ -63,24 +92,27 @@ export default function LoginScreen({ onLogin }) {
         <View style={styles.form}>
           <Text style={styles.label}>Username:</Text>
           <TextInput
-            style={styles.input}
-            placeholder="Enter your username"
+            style={[styles.input, emailError ? styles.inputError : null]}
+            placeholder="Enter your email"
             placeholderTextColor="rgba(150,190,230,0.5)"
             value={username}
-            onChangeText={setUsername}
+            onChangeText={(v) => { setUsername(v); if (emailError) validateEmail(v); }}
             autoCapitalize="none"
             autoCorrect={false}
+            keyboardType="email-address"
           />
+          {emailError ? <Text style={styles.fieldErrorText}>{emailError}</Text> : null}
 
           <Text style={styles.label}>Password:</Text>
           <TextInput
-            style={styles.input}
-            placeholder="Enter your password"
+            style={[styles.input, passwordError ? styles.inputError : null]}
+            placeholder="Enter your password (min. 8 characters)"
             placeholderTextColor="rgba(150,190,230,0.5)"
             value={password}
-            onChangeText={setPassword}
+            onChangeText={(v) => { setPassword(v); if (passwordError) validatePassword(v); }}
             secureTextEntry
           />
+          {passwordError ? <Text style={styles.fieldErrorText}>{passwordError}</Text> : null}
 
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
@@ -143,6 +175,17 @@ const styles = StyleSheet.create({
     color: TEXT,
     fontSize: 15,
     marginBottom: 20,
+    fontFamily: 'Lato_400Regular',
+  },
+  inputError: {
+    borderColor: '#ff6b6b',
+  },
+  fieldErrorText: {
+    color: '#ff6b6b',
+    fontSize: 13,
+    alignSelf: 'flex-start',
+    marginTop: -14,
+    marginBottom: 12,
     fontFamily: 'Lato_400Regular',
   },
   errorText: {

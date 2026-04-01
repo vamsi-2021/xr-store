@@ -1,7 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image } from 'react-native';
 const XR_LOGO = require('../assets/xr-store-logo.png');
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import * as Battery from 'expo-battery';
 import data from '../data/sampleData.json';
 import AuthService from '../services/AuthService';
 
@@ -12,9 +13,25 @@ const TEXT_PRIMARY = '#cce0f5';
 
 export default function DashboardScreen({ user: userProp, onSelectApp, onOpenStore, onLogout }) {
   const [selectedApp, setSelectedApp] = useState(data.installedApps[0].id);
+  const [batteryLevel, setBatteryLevel] = useState(null);
   const { installedApps } = data;
   // Use API user if available, fall back to sample data
   const user = userProp || data.user;
+
+  useEffect(() => {
+    let subscription;
+    Battery.getBatteryLevelAsync()
+      .then((level) => setBatteryLevel(Math.round(level * 100)))
+      .catch(() => setBatteryLevel('N/A'));
+    try {
+      subscription = Battery.addBatteryLevelListener(({ batteryLevel: level }) => {
+        setBatteryLevel(Math.round(level * 100));
+      });
+    } catch {
+      // native module unavailable (Expo Go)
+    }
+    return () => subscription?.remove();
+  }, []);
 
   const handleLogout = async () => {
     await AuthService.logout();
@@ -39,7 +56,9 @@ export default function DashboardScreen({ user: userProp, onSelectApp, onOpenSto
       <View style={styles.userCard}>
         <View style={styles.userInfo}>
           <Text style={styles.userName}>{user.name}</Text>
-          <Text style={styles.batteryText}>Battery {user.battery}</Text>
+          <Text style={styles.batteryText}>
+            Battery {batteryLevel !== null ? (batteryLevel === 'N/A' ? 'N/A' : `${batteryLevel}%`) : '...'}
+          </Text>
         </View>
         <View style={styles.statusBadge}>
           <Text style={styles.statusText}>Currently{'\n'}Online</Text>
