@@ -3,15 +3,23 @@ import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image } from 'rea
 const XR_LOGO = require('../assets/xr-store-logo.png');
 import { useState } from 'react';
 import data from '../data/sampleData.json';
+import AuthService from '../services/AuthService';
 
 const BG = '#0d1b2a';
 const CARD = '#1c2e45';
 const ITEM = '#8fa8c0';
 const TEXT_PRIMARY = '#cce0f5';
 
-export default function DashboardScreen({ onSelectApp, onOpenStore }) {
+export default function DashboardScreen({ user: userProp, onSelectApp, onOpenStore, onLogout }) {
   const [selectedApp, setSelectedApp] = useState(data.installedApps[0].id);
-  const { user, installedApps } = data;
+  const { installedApps } = data;
+  // Use API user if available, fall back to sample data
+  const user = userProp || data.user;
+
+  const handleLogout = async () => {
+    await AuthService.logout();
+    onLogout();
+  };
 
   return (
     <View style={styles.container}>
@@ -22,8 +30,8 @@ export default function DashboardScreen({ onSelectApp, onOpenStore }) {
         <TouchableOpacity onPress={onOpenStore}>
           <Image source={XR_LOGO} style={styles.logoImage} resizeMode="contain" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.backButton}>
-          <Text style={styles.backButtonText}>Back</Text>
+        <TouchableOpacity style={styles.backButton} onPress={handleLogout}>
+          <Text style={styles.backButtonText}>Logout</Text>
         </TouchableOpacity>
       </View>
 

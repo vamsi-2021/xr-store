@@ -9,14 +9,25 @@ import StoreScreen from './screens/StoreScreen';
 export default function App() {
   const [screen, setScreen] = useState('login'); // 'login' | 'dashboard' | 'store' | 'detail'
   const [selectedApp, setSelectedApp] = useState(null);
+  const [user, setUser] = useState(null);
   const [fontsLoaded] = useFonts({ Lato_400Regular, Lato_700Bold });
 
   if (!fontsLoaded) {
     return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><ActivityIndicator /></View>;
   }
 
+  const handleLogin = (userInfo) => {
+    setUser(userInfo);
+    setScreen('dashboard');
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setScreen('login');
+  };
+
   if (screen === 'login') {
-    return <LoginScreen onLogin={() => setScreen('dashboard')} />;
+    return <LoginScreen onLogin={handleLogin} />;
   }
 
   if (screen === 'detail' && selectedApp) {
@@ -40,8 +51,10 @@ export default function App() {
 
   return (
     <DashboardScreen
+      user={user}
       onSelectApp={(app) => { setSelectedApp(app); setScreen('detail'); }}
       onOpenStore={() => setScreen('store')}
+      onLogout={handleLogout}
     />
   );
 }
