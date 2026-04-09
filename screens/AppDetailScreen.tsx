@@ -1,4 +1,7 @@
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image } from 'react-native';
+import React from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image, StatusBar } from 'react-native';
+import DashboardModel from '../models/DashboardModel';
+
 const XR_LOGO = require('../assets/xr-store-logo.png');
 
 const BG = '#0d1b2a';
@@ -6,9 +9,16 @@ const CARD = '#1c2e45';
 const TEXT_PRIMARY = '#cce0f5';
 const DIVIDER = '#3a5a7a';
 
-export default function AppDetailScreen({ app, onBack, onOpenStore }) {
+type Props = {
+  app: DashboardModel;
+  onBack: () => void;
+  onOpenStore: () => void;
+};
+
+export default function AppDetailScreen({ app, onBack, onOpenStore }: Props) {
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor={BG} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -23,36 +33,34 @@ export default function AppDetailScreen({ app, onBack, onOpenStore }) {
       {/* Main Card */}
       <ScrollView style={styles.card} contentContainerStyle={{ padding: 16 }} showsVerticalScrollIndicator={false}>
 
-        {/* App Image */}
-        <Image source={{ uri: app.thumbnail }} style={styles.imagePlaceholder} resizeMode="cover" />
+        {/* Banner Image */}
+        <Image source={{ uri: app.bannerURL }} style={styles.bannerImage} resizeMode="cover" />
 
         {/* Title */}
-        <Text style={styles.title}>{app.name}</Text>
+        <Text style={styles.title}>{app.applicationName}</Text>
+
+        {/* Version & Size */}
+        <Text style={styles.meta}>Version {app.versionNumber}  ·  {app.fileSize}</Text>
 
         {/* Action Buttons */}
         <View style={styles.buttonRow}>
           <TouchableOpacity style={styles.launchButton}>
-            <Text style={styles.launchButtonText}>Launch (or{'\n'}update)</Text>
+            <Text style={styles.launchButtonText}>Launch</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.uninstallButton}>
             <Text style={styles.uninstallButtonText}>Uninstall</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Requirements */}
-        <Text style={styles.sectionTitle}>Requirements</Text>
+        {/* Summary */}
+        <Text style={styles.sectionTitle}>Summary</Text>
         <View style={styles.divider} />
-        <Text style={styles.sectionContent}>{app.requirements}</Text>
+        <Text style={styles.sectionContent}>{app.summary}</Text>
 
-        {/* Description */}
-        <Text style={styles.sectionTitle}>Description</Text>
+        {/* Patch Notes */}
+        <Text style={styles.sectionTitle}>Patch Notes</Text>
         <View style={styles.divider} />
-        <Text style={styles.sectionContent}>{app.description}</Text>
-
-        {/* Release Notes */}
-        <Text style={styles.sectionTitle}>Release Notes</Text>
-        <View style={styles.divider} />
-        <Text style={styles.sectionContent}>{app.releaseNotes}</Text>
+        <Text style={styles.sectionContent}>{app.patchNotes}</Text>
 
       </ScrollView>
     </View>
@@ -66,8 +74,6 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingHorizontal: 16,
   },
-
-  // Header
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -89,71 +95,60 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '500',
   },
-
-  // Card
   card: {
     backgroundColor: CARD,
     borderRadius: 12,
     flex: 1,
   },
-
-  // Image
-  imagePlaceholder: {
+  bannerImage: {
     backgroundColor: '#8fa8c0',
     borderRadius: 10,
     height: 180,
-    justifyContent: 'center',
-    alignItems: 'center',
     marginBottom: 16,
   },
-  imagePlaceholderText: {
-    color: '#1a2e45',
-    fontSize: 18,
-    fontStyle: 'italic',
-  },
-
-  // Title
   title: {
     color: TEXT_PRIMARY,
     fontSize: 26,
     fontWeight: '400',
+    marginBottom: 6,
+  },
+  meta: {
+    color: TEXT_PRIMARY,
+    fontSize: 13,
+    opacity: 0.7,
     marginBottom: 16,
   },
-
-  // Buttons
   buttonRow: {
     flexDirection: 'row',
     gap: 12,
     marginBottom: 24,
   },
   launchButton: {
-    backgroundColor: '#1a2e45',
+    backgroundColor: '#4a8a3a',
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 10,
     flex: 1,
+    alignItems: 'center',
   },
   launchButtonText: {
     color: TEXT_PRIMARY,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 15,
+    fontWeight: '500',
   },
   uninstallButton: {
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#7a2a20',
     borderRadius: 8,
     paddingHorizontal: 20,
     paddingVertical: 10,
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
   },
   uninstallButtonText: {
     color: TEXT_PRIMARY,
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '500',
   },
-
-  // Sections
   sectionTitle: {
     color: TEXT_PRIMARY,
     fontSize: 20,

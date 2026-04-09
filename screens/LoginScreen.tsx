@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -9,8 +9,8 @@ import {
   Platform,
   Image,
   ActivityIndicator,
+  StatusBar,
 } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import AuthService from '../services/AuthService';
 
 const BG = '#0d1b2a';
@@ -18,11 +18,24 @@ const INPUT_BG = 'rgba(10, 30, 55, 0.8)';
 const BORDER = '#3a7bd5';
 const BUTTON_BG = '#3a7bd5';
 const TEXT = '#e0f0ff';
-const LABEL = '#cce0f5';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export default function LoginScreen({ onLogin }) {
+type User = {
+  sub: string;
+  name: string;
+  given_name?: string;
+  family_name?: string;
+  email: string;
+  preferred_username: string;
+  roles: string[];
+};
+
+type Props = {
+  onLogin: (user: User) => void;
+};
+
+export default function LoginScreen({ onLogin }: Props) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -30,7 +43,7 @@ export default function LoginScreen({ onLogin }) {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
 
-  const validateEmail = (value) => {
+  const validateEmail = (value: string): boolean => {
     if (!value.trim()) {
       setEmailError('Email is required.');
       return false;
@@ -43,7 +56,7 @@ export default function LoginScreen({ onLogin }) {
     return true;
   };
 
-  const validatePassword = (value) => {
+  const validatePassword = (value: string): boolean => {
     if (!value) {
       setPasswordError('Password is required.');
       return false;
@@ -65,7 +78,7 @@ export default function LoginScreen({ onLogin }) {
     try {
       const { user } = await AuthService.login(username.trim(), password);
       onLogin(user);
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message || 'Login failed. Please try again.');
     } finally {
       setLoading(false);
@@ -74,12 +87,11 @@ export default function LoginScreen({ onLogin }) {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="light" />
+      <StatusBar barStyle="light-content" backgroundColor={BG} />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.inner}
       >
-        {/* Logo */}
         <View style={styles.logoWrapper}>
           <Image
             source={require('../assets/xr-store-logo.png')}
@@ -88,7 +100,6 @@ export default function LoginScreen({ onLogin }) {
           />
         </View>
 
-        {/* Form */}
         <View style={styles.form}>
           <Text style={styles.label}>Username:</Text>
           <TextInput
@@ -162,7 +173,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     alignSelf: 'center',
     marginBottom: 8,
-    fontFamily: 'Lato_700Bold',
   },
   input: {
     width: '100%',
@@ -175,7 +185,6 @@ const styles = StyleSheet.create({
     color: TEXT,
     fontSize: 15,
     marginBottom: 20,
-    fontFamily: 'Lato_400Regular',
   },
   inputError: {
     borderColor: '#ff6b6b',
@@ -186,14 +195,12 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     marginTop: -14,
     marginBottom: 12,
-    fontFamily: 'Lato_400Regular',
   },
   errorText: {
     color: '#ff6b6b',
     fontSize: 14,
     marginBottom: 12,
     textAlign: 'center',
-    fontFamily: 'Lato_400Regular',
   },
   button: {
     backgroundColor: BUTTON_BG,
@@ -216,6 +223,5 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
-    fontFamily: 'Lato_700Bold',
   },
 });

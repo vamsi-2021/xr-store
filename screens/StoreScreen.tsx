@@ -1,24 +1,39 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, TextInput, Image } from 'react-native';
-const XR_LOGO = require('../assets/xr-store-logo.png');
-import { useState } from 'react';
+import React, { useState } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  FlatList,
+  TextInput,
+  Image,
+  StatusBar,
+} from 'react-native';
+import DashboardModel from '../models/DashboardModel';
 import data from '../data/sampleData.json';
+
+const XR_LOGO = require('../assets/xr-store-logo.png');
 
 const BG = '#0d1b2a';
 const CARD = '#1c2e45';
 const ITEM = '#8fa8c0';
 const TEXT_PRIMARY = '#cce0f5';
 
-export default function StoreScreen({ onSelectApp, onBack }) {
+type Props = {
+  onSelectApp: (app: DashboardModel) => void;
+  onBack: () => void;
+};
+
+export default function StoreScreen({ onSelectApp, onBack }: Props) {
   const [search, setSearch] = useState('');
 
-  const filtered = data.storeApps.filter((app) =>
-    app.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = data.apps
+    .filter((app) => app.ApplicationName.toLowerCase().includes(search.toLowerCase()))
+    .map((app) => new DashboardModel(app));
 
   return (
     <View style={styles.container}>
-      <StatusBar style="light" />
+      <StatusBar barStyle="light-content" backgroundColor={BG} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -41,21 +56,24 @@ export default function StoreScreen({ onSelectApp, onBack }) {
       </View>
 
       {/* App List */}
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {filtered.map((app) => (
-          <View key={app.id} style={styles.appItem}>
+      <FlatList
+        data={filtered}
+        keyExtractor={(app) => app.fileName}
+        showsVerticalScrollIndicator={false}
+        renderItem={({ item: app }) => (
+          <View style={styles.appItem}>
             <View style={styles.appThumbnail}>
-              <Text style={styles.thumbnailText}>pic</Text>
+              <Image source={{ uri: app.logoURL }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
             </View>
             <View style={styles.appInfo}>
-              <Text style={styles.appName}>{app.name}</Text>
+              <Text style={styles.appName}>{app.applicationName}</Text>
               <TouchableOpacity style={styles.launchButton} onPress={() => onSelectApp(app)}>
-                <Text style={styles.launchButtonText}>Launch</Text>
+                <Text style={styles.launchButtonText}>View</Text>
               </TouchableOpacity>
             </View>
           </View>
-        ))}
-      </ScrollView>
+        )}
+      />
     </View>
   );
 }
@@ -67,8 +85,6 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingHorizontal: 16,
   },
-
-  // Header
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -79,7 +95,6 @@ const styles = StyleSheet.create({
     width: 120,
     height: 44,
   },
-
   backButton: {
     backgroundColor: '#2a4060',
     borderRadius: 8,
@@ -89,10 +104,7 @@ const styles = StyleSheet.create({
   backButtonText: {
     color: TEXT_PRIMARY,
     fontSize: 15,
-    fontFamily: 'Lato_400Regular',
   },
-
-  // Search
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -108,13 +120,10 @@ const styles = StyleSheet.create({
     flex: 1,
     color: TEXT_PRIMARY,
     fontSize: 16,
-    fontFamily: 'Lato_400Regular',
   },
   searchIcon: {
     fontSize: 18,
   },
-
-  // App Items
   appItem: {
     backgroundColor: ITEM,
     borderRadius: 14,
@@ -129,13 +138,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#b0c4d8',
     borderRadius: 10,
     marginRight: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  thumbnailText: {
-    color: '#1a2e45',
-    fontSize: 13,
-    fontStyle: 'italic',
+    overflow: 'hidden',
   },
   appInfo: {
     flex: 1,
@@ -144,7 +147,7 @@ const styles = StyleSheet.create({
   appName: {
     color: '#1a2e45',
     fontSize: 18,
-    fontFamily: 'Lato_700Bold',
+    fontWeight: '700',
   },
   launchButton: {
     backgroundColor: '#1c3a5c',
@@ -155,6 +158,5 @@ const styles = StyleSheet.create({
   launchButtonText: {
     color: TEXT_PRIMARY,
     fontSize: 15,
-    fontFamily: 'Lato_400Regular',
   },
 });

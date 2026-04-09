@@ -3,31 +3,38 @@ import NetworkService from './NetworkService';
 const CLIENT_ID = 'user_client';
 const SCOPE = 'lrs:statements/write openid profile email lrs:statements/read/mine';
 
-// Decode a JWT without verifying the signature (client-side read-only use)
-function parseJWT(token) {
+type JWTClaims = {
+  sub: string;
+  name: string;
+  given_name?: string;
+  family_name?: string;
+  email: string;
+  preferred_username: string;
+  realm_access?: { roles: string[] };
+};
+
+export type AuthUser = {
+  sub: string;
+  name: string;
+  given_name?: string;
+  family_name?: string;
+  email: string;
+  preferred_username: string;
+  roles: string[];
+};
+
+function parseJWT(token: string): JWTClaims | null {
   try {
     const payload = token.split('.')[1];
-    // atob is available in React Native's Hermes engine; replace with a polyfill if needed
     const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
-    return JSON.parse(decoded);
+    return JSON.parse(decoded) as JWTClaims;
   } catch {
     return null;
   }
 }
 
 const AuthService = {
-  /**
-   * Login
-   * POST /token  (application/x-www-form-urlencoded)
-   *
-   * Returns:
-   * {
-   *   access_token, refresh_token, id_token, expires_in,
-   *   token_type, session_state, scope,
-   *   user: { sub, name, given_name, family_name, email, preferred_username, roles }
-   * }
-   */
-  async login(username, password) {
+  async login(username: string, password: string): Promise<{ user: AuthUser }> {
     const data = await NetworkService.postForm('/token', {
       client_id: CLIENT_ID,
       username,
@@ -36,12 +43,10 @@ const AuthService = {
       scope: SCOPE,
     });
 
-    // Store both tokens for authenticated requests and logout
     NetworkService.setTokens(data.access_token, data.refresh_token);
 
-    // Extract user profile from the JWT payload — avoids a separate /userinfo call
     const claims = parseJWT(data.access_token);
-    const user = claims
+    const user: AuthUser = claims
       ? {
           sub: claims.sub,
           name: claims.name,
@@ -51,17 +56,12 @@ const AuthService = {
           preferred_username: claims.preferred_username,
           roles: claims.realm_access?.roles ?? [],
         }
-      : null;
+      : { sub: '', name: '', email: '', preferred_username: '', roles: [] };
 
     return { ...data, user };
   },
 
-  /**
-   * Logout
-   * POST /logout  (application/x-www-form-urlencoded)
-   * Sends refresh_token to invalidate the Keycloak session server-side
-   */
-  async logout() {
+  async logout(): Promise<void> {
     const refreshToken = NetworkService.getRefreshToken();
     try {
       if (refreshToken) {
@@ -71,19 +71,11 @@ const AuthService = {
         });
       }
     } finally {
-      // Always clear local tokens even if the server call fails
       NetworkService.clearTokens();
     }
   },
 
-  /**
-   * Get current user info
-   * GET /userinfo
-   * Authorization: Bearer <access_token>
-   *
-   * Response: { sub, name, given_name, family_name, email, preferred_username, email_verified }
-   */
-  getUserInfo() {
+  getUserInfo(): Promise<any> {
     return NetworkService.get('/userinfo');
   },
 };

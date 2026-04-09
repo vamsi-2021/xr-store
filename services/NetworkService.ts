@@ -1,36 +1,43 @@
-const BASE_URL = 'https://keycloak.betaflixinc.com/realms/BetaFlix-Experiments/protocol/openid-connect';
+const BASE_URL =
+  'https://keycloak.betaflixinc.com/realms/BetaFlix-Experiments/protocol/openid-connect';
 
-// In-memory token store — replace with SecureStore/AsyncStorage for persistence
-let accessToken = null;
-let refreshToken = null;
+let accessToken: string | null = null;
+let refreshToken: string | null = null;
+
+type RequestMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
 const NetworkService = {
   // ─── Token Management ────────────────────────────────────────────────────────
 
-  setTokens(access, refresh) {
+  setTokens(access: string, refresh: string): void {
     accessToken = access;
     refreshToken = refresh;
   },
 
-  getToken() {
+  getToken(): string | null {
     return accessToken;
   },
 
-  getRefreshToken() {
+  getRefreshToken(): string | null {
     return refreshToken;
   },
 
-  clearTokens() {
+  clearTokens(): void {
     accessToken = null;
     refreshToken = null;
   },
 
   // ─── JSON Request ─────────────────────────────────────────────────────────────
 
-  async request(method, endpoint, body = null, requiresAuth = true) {
+  async request(
+    method: RequestMethod,
+    endpoint: string,
+    body: object | null = null,
+    requiresAuth: boolean = true,
+  ): Promise<any> {
     const url = `${BASE_URL}${endpoint}`;
 
-    const headers = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       Accept: 'application/json',
     };
@@ -39,7 +46,7 @@ const NetworkService = {
       headers['Authorization'] = `Bearer ${accessToken}`;
     }
 
-    const options = { method, headers };
+    const options: RequestInit = { method, headers };
 
     if (body !== null) {
       options.body = JSON.stringify(body);
@@ -48,12 +55,12 @@ const NetworkService = {
     return this._send(url, options);
   },
 
-  // ─── Form-Encoded Request (required by Keycloak token endpoints) ──────────────
+  // ─── Form-Encoded Request ─────────────────────────────────────────────────────
 
-  async postForm(endpoint, params) {
+  async postForm(endpoint: string, params: Record<string, string>): Promise<any> {
     const url = `${BASE_URL}${endpoint}`;
 
-    const headers = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/x-www-form-urlencoded',
       Accept: 'application/json',
     };
@@ -65,10 +72,10 @@ const NetworkService = {
 
   // ─── Shared Response Handler ──────────────────────────────────────────────────
 
-  async _send(url, options) {
+  async _send(url: string, options: RequestInit): Promise<any> {
     const response = await fetch(url, options);
 
-    let data;
+    let data: any;
     const contentType = response.headers.get('Content-Type') || '';
     if (contentType.includes('application/json')) {
       data = await response.json();
@@ -77,11 +84,11 @@ const NetworkService = {
     }
 
     if (!response.ok) {
-      const message =
+      const message: string =
         (data && (data.error_description || data.message)) ||
         (typeof data === 'string' ? data : null) ||
         `Request failed with status ${response.status}`;
-      const error = new Error(message);
+      const error: any = new Error(message);
       error.status = response.status;
       error.data = data;
       throw error;
@@ -92,19 +99,19 @@ const NetworkService = {
 
   // ─── Convenience Methods ──────────────────────────────────────────────────────
 
-  get(endpoint, requiresAuth = true) {
+  get(endpoint: string, requiresAuth: boolean = true): Promise<any> {
     return this.request('GET', endpoint, null, requiresAuth);
   },
 
-  post(endpoint, body, requiresAuth = true) {
+  post(endpoint: string, body: object, requiresAuth: boolean = true): Promise<any> {
     return this.request('POST', endpoint, body, requiresAuth);
   },
 
-  put(endpoint, body, requiresAuth = true) {
+  put(endpoint: string, body: object, requiresAuth: boolean = true): Promise<any> {
     return this.request('PUT', endpoint, body, requiresAuth);
   },
 
-  delete(endpoint, requiresAuth = true) {
+  delete(endpoint: string, requiresAuth: boolean = true): Promise<any> {
     return this.request('DELETE', endpoint, null, requiresAuth);
   },
 };

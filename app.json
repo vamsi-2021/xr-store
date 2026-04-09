@@ -1,34 +1,4 @@
 {
-  "expo": {
-    "name": "xr-store",
-    "slug": "xr-store",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/xr-store-logo.png",
-    "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/xr-store-logo.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.SampleApp"
-    },
-    "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/xr-store-logo.png",
-        "backgroundImage": "./assets/xr-store-logo.png",
-        "monochromeImage": "./assets/xr-store-logo.png"
-      },
-      "package": "com.anonymous.SampleApp"
-    },
-    "web": {
-      "favicon": "./assets/xr-store-logo.png.png"
-    },
-    "plugins": [
-      "expo-font"
-    ]
-  }
+  "name": "xrstore",
+  "displayName": "XR Store"
 }

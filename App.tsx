@@ -1,22 +1,29 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { View, ActivityIndicator } from 'react-native';
-import { useFonts, Lato_400Regular, Lato_700Bold } from '@expo-google-fonts/lato';
 import LoginScreen from './screens/LoginScreen';
 import DashboardScreen from './screens/DashboardScreen';
 import AppDetailScreen from './screens/AppDetailScreen';
 import StoreScreen from './screens/StoreScreen';
+import DashboardModel from './models/DashboardModel';
+
+type Screen = 'login' | 'dashboard' | 'store' | 'detail';
+
+type User = {
+  sub: string;
+  name: string;
+  given_name?: string;
+  family_name?: string;
+  email: string;
+  preferred_username: string;
+  roles: string[];
+};
 
 export default function App() {
-  const [screen, setScreen] = useState('login'); // 'login' | 'dashboard' | 'store' | 'detail'
-  const [selectedApp, setSelectedApp] = useState(null);
-  const [user, setUser] = useState(null);
-  const [fontsLoaded] = useFonts({ Lato_400Regular, Lato_700Bold });
+  const [screen, setScreen] = useState<Screen>('login');
+  const [selectedApp, setSelectedApp] = useState<DashboardModel | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
-  if (!fontsLoaded) {
-    return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><ActivityIndicator /></View>;
-  }
-
-  const handleLogin = (userInfo) => {
+  const handleLogin = (userInfo: User) => {
     setUser(userInfo);
     setScreen('dashboard');
   };
@@ -24,6 +31,11 @@ export default function App() {
   const handleLogout = () => {
     setUser(null);
     setScreen('login');
+  };
+
+  const handleSelectApp = (app: DashboardModel) => {
+    setSelectedApp(app);
+    setScreen('detail');
   };
 
   if (screen === 'login') {
@@ -44,15 +56,15 @@ export default function App() {
     return (
       <StoreScreen
         onBack={() => setScreen('dashboard')}
-        onSelectApp={(app) => { setSelectedApp(app); setScreen('detail'); }}
+        onSelectApp={handleSelectApp}
       />
     );
   }
 
   return (
     <DashboardScreen
-      user={user}
-      onSelectApp={(app) => { setSelectedApp(app); setScreen('detail'); }}
+      user={user!}
+      onSelectApp={handleSelectApp}
       onOpenStore={() => setScreen('store')}
       onLogout={handleLogout}
     />
